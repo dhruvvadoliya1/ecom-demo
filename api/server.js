@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path');
 const dotenv = require('dotenv')
 dotenv.config()
 const router = require('./routers');
@@ -15,6 +16,14 @@ app.use((req, res) => {
     res.status(404).send({ message: 'Route' + req.url + ' Not found.' });
 })
 
-app.listen(3000, () => {
+if (process.env.NODE_ENV === 'production') {
+    const clientBuildPath = path.join(__dirname, '../client/build');
+    app.use(express.static(clientBuildPath));
+    app.get('*', (req, res) =>
+      res.sendFile(path.resolve(clientBuildPath, 'index.html'))
+    );
+  }
+
+app.listen(5000, () => {
     console.log("server is up and running")
 })
